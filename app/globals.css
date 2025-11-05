@@ -1,26 +1,153 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ===== Paleta TBV + tokens ===== */
+:root{
+  --tbv-500:#84B9E6;
+  --tbv-600:#6FAEE0;
+  --tbv-700:#2E6FA8;
+  --tbv-gold:#F1A73A;
+  --foreground:#e6edf3;
+
+  --bg-gradient:
+    radial-gradient(800px 400px at 10% 10%, rgba(132,185,230,0.18), transparent 60%),
+    radial-gradient(700px 350px at 90% 20%, rgba(111,174,224,0.16), transparent 60%),
+    radial-gradient(600px 300px at 50% 100%, rgba(46,111,168,0.25), transparent 60%),
+    linear-gradient(180deg, #0c1116 0%, rgba(12,17,22,.92) 60%, #0c1116 100%);
+
+  --gap-xl: 3rem;
+  --gap-lg: 1.25rem;
+
+  --navbar-h: 80px;
+  --sponsors-preview: 170px;
+
+  /* 🔧 NUEVO: offset fino para “pegar” el hero al header */
+  --hero-offset-mobile: 0.25rem;  /* subí/bajá el hero en TELÉFONO */
+  --hero-offset-desktop: 0.75rem; /* subí/bajá el hero en ESCRITORIO */
+
+  --marquee-gap: 2.5rem;
+  --marquee-speed: 24000ms;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@media (max-width: 768px){
+  :root{
+    --gap-xl: 2.25rem;
+    --gap-lg: 1rem;
+    --sponsors-preview: 150px;
+    --marquee-speed: 30000ms;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ===== Reset + tema ===== */
+html{ scroll-behavior:smooth; color-scheme: dark; }
+html,body{ height:100%; }
+*{ box-sizing:border-box; }
+body{
+  margin:0;
+  color:var(--foreground);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  background: var(--bg-gradient);
+  background-attachment: fixed;
 }
+
+/* ===== Accesibilidad ===== */
+a,button,input,select,textarea { outline: none; }
+:focus-visible{
+  outline: 2px solid var(--tbv-500);
+  outline-offset: 3px;
+  border-radius: .5rem;
+}
+.skip-link{
+  position:absolute; left:-999px; top:0; z-index:9999;
+  background:#0b1824; color:var(--foreground);
+  padding:.75rem 1rem; border-radius:0 0 .75rem .75rem;
+  box-shadow:0 6px 24px rgba(0,0,0,.35);
+}
+.skip-link:focus{ left:0; }
+
+/* ===== Contenedor ===== */
+.container-tbv{ max-width:1200px; margin:0 auto; padding:0 1rem; }
+
+/* ===== Botones ===== */
+.btn{ display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
+  padding:.8rem 1.25rem; border-radius:9999px; font-weight:700;
+  transition:transform .2s ease, opacity .2s ease, background-color .2s ease; }
+.btn:active{ transform:translateY(1px); }
+.btn-primary{ background:var(--tbv-gold); color:#141414; }
+.btn-primary:hover{ opacity:.95; transform:translateY(-1px); }
+.btn-outline{ border:1px solid rgba(255,255,255,.16); color:#fff; background:transparent; }
+.btn-outline:hover{ background:rgba(255,255,255,.06); }
+
+/* ===== Superficies ===== */
+.surface {
+  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 1rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+/* ===== Navbar ===== */
+.navbar{ height:var(--navbar-h); }
+.navbar-stick {
+  position: sticky; top: 0; z-index: 50;
+  transition: background .25s ease, box-shadow .25s ease, border-color .25s ease;
+  border-bottom: 1px solid transparent;
+}
+.navbar--glass {
+  background: rgba(12,17,22, .98);
+  border-bottom-color: rgba(255,255,255,.08);
+  box-shadow: 0 8px 28px rgba(0,0,0,.32);
+  backdrop-filter: saturate(140%) blur(6px);
+}
+
+/* ===== Marquee (una sola fila) ===== */
+.marquee{ position:relative; overflow:hidden;
+  mask-image:linear-gradient(to right, transparent, black 10%, black 90%, transparent); }
+.marquee__row{
+  display:flex; align-items:center; gap:var(--marquee-gap);
+  width:max-content; will-change: transform;
+  animation: marquee var(--marquee-speed) linear infinite;
+  transform: translate3d(0,0,0);
+}
+.marquee__item{
+  flex:none; display:inline-flex; align-items:center; justify-content:center;
+  min-width:160px; height:64px; padding:.5rem 1rem;
+  background: rgba(255,255,255,.02);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: .75rem;
+}
+@keyframes marquee{
+  0%{ transform:translate3d(0,0,0); }
+  100%{ transform:translate3d(-50%,0,0); }
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce){
+  .marquee__row{ animation:none; }
+  .btn{ transition:none; }
+}
+
+/* ===== Hero compacto + offset fino ===== */
+.hero-section{
+  /* sponsors visibles al fondo en el top */
+  min-height: calc(100vh - var(--navbar-h) - var(--sponsors-preview));
+  /* 🔧 Acá “pegás” el hero al header: suma la altura del header + un offset regulable */
+  padding-top: calc(var(--navbar-h) + var(--hero-offset-desktop));
+  padding-bottom: var(--gap-xl);
+}
+
+@media (max-width: 768px){
+  .hero-section{
+    /* 🔹 Menos espacio arriba (hero más pegado al header) */
+    padding-top: calc(var(--navbar-h) - 15rem);
+    /* 🔹 Un poco menos de padding abajo */
+    padding-bottom: 1.5rem;
+  }
+
+  /* 🔹 Imagen del hero: ocupa ancho completo, se ve entera */
+  .hero-section img{
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+}
+

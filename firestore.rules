@@ -1,0 +1,27 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Partidos y tablas públicas
+    match /matches/{id} {
+      allow read: if true; // todos pueden ver fixture y resultados
+      allow write: if request.auth != null
+                   && (request.auth.uid in [
+                     "E0K9Gi7DBiOsZgaY9zHJRB1nrJ73", // <- pegá tu UID acá
+                     "UID_ADMIN_2"  // <- opcional otro admin
+                   ]);
+    }
+
+    // (Opcional) otras colecciones públicas de lectura, p.ej. canchas, equipos
+    match /courts/{id} {
+      allow read: if true;
+      allow write: if request.auth != null
+                   && (request.auth.uid in ["UID_ADMIN_1","UID_ADMIN_2"]);
+    }
+
+    // Bloqueo por defecto de todo lo demás
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
