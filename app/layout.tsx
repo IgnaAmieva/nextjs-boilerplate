@@ -1,3 +1,4 @@
+// app/layout.tsx
 import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
@@ -18,7 +19,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Saltar al contenido
         </a>
 
-        {/* 🛒 Carrito global envuelve toda la app */}
         <CartProvider>
           <Navbar />
           <main id="main-content">{children}</main>

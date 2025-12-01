@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,7 +9,7 @@ import { useRouter } from "next/navigation";
 type Producto = {
   id: string;
   nombre: string;
-  precio: number;   // ARS
+  precio: number; // ARS
   imagen: string;
   categoria: "Camiseta" | "Short" | "Entrenamiento";
 };
@@ -18,7 +19,8 @@ export default function TiendaPage() {
   const { add } = useCart();
 
   const [modalAbierto, setModalAbierto] = useState(false);
-  const [productoSeleccionado, setProductoSeleccionado] = useState<Producto | null>(null);
+  const [productoSeleccionado, setProductoSeleccionado] =
+    useState<Producto | null>(null);
   const [talle, setTalle] = useState("M");
   const [color, setColor] = useState("Celeste");
   const [cantidad, setCantidad] = useState(1);
@@ -26,12 +28,12 @@ export default function TiendaPage() {
 
   const colores = [
     { nombre: "Celeste", hex: "#84B9E6" },
-    { nombre: "Blanca",  hex: "#e6edf3" },
-    { nombre: "Negra",   hex: "#0c1116" },
+    { nombre: "Blanca", hex: "#e6edf3" },
+    { nombre: "Negra", hex: "#0c1116" },
   ];
   const talles = ["S", "M", "L", "XL", "XXL", "XXXL"];
 
-  // ✅ Producto principal (arriba, ocupa todo el ancho en móvil)
+  // ✅ Producto principal
   const productoPrincipal: Producto = {
     id: "remera-oficial",
     nombre: "Remera oficial del torneo",
@@ -40,12 +42,36 @@ export default function TiendaPage() {
     categoria: "Camiseta",
   };
 
-  // ✅ Solo 4 ítems (grid dos columnas en móvil)
+  // ✅ Otras prendas
   const productos: Producto[] = [
-    { id: "remera-celeste", nombre: "Camiseta celeste",  precio: 0, imagen: "/tienda/remera-celeste1.jpg", categoria: "Camiseta" },
-    { id: "remera-negra",   nombre: "Camiseta negra",    precio: 10, imagen: "/tienda/remera-negra1.jpg",   categoria: "Camiseta" },
-    { id: "short-negro",    nombre: "Short negro",       precio: 15000, imagen: "/tienda/short-negro.jpg",     categoria: "Short" },
-    { id: "train-negra",    nombre: "Remera entrenamiento", precio: 14000, imagen: "/tienda/train-negra.jpg",  categoria: "Entrenamiento" },
+    {
+      id: "remera-celeste",
+      nombre: "Camiseta celeste",
+      precio: 18000,
+      imagen: "/tienda/remera-celeste1.jpg",
+      categoria: "Camiseta",
+    },
+    {
+      id: "remera-negra",
+      nombre: "Camiseta negra",
+      precio: 18000,
+      imagen: "/tienda/remera-negra1.jpg",
+      categoria: "Camiseta",
+    },
+    {
+      id: "short-negro",
+      nombre: "Short negro",
+      precio: 15000,
+      imagen: "/tienda/short-negro.jpg",
+      categoria: "Short",
+    },
+    {
+      id: "train-negra",
+      nombre: "Remera entrenamiento",
+      precio: 14000,
+      imagen: "/tienda/train-negra.jpg",
+      categoria: "Entrenamiento",
+    },
   ];
 
   const abrirModal = (producto: Producto) => {
@@ -59,6 +85,8 @@ export default function TiendaPage() {
   const agregarAlCarrito = () => {
     if (!productoSeleccionado || adding) return;
     setAdding(true);
+
+    // 👉 Se guarda en el contexto del carrito
     add({
       id: productoSeleccionado.id,
       name: productoSeleccionado.nombre,
@@ -68,15 +96,17 @@ export default function TiendaPage() {
       size: talle,
       qty: cantidad,
     });
+
     setAdding(false);
     setModalAbierto(false);
+
+    // 👉 Los llevo a la pantalla donde ahora completan todos los datos
     router.push("/carrito");
   };
 
   return (
     <main>
       {/* ===== Producto principal ===== */}
-      {/* Mismo “pegado” al header que el hero de la home: en móvil más arriba, en desktop balanceado */}
       <section className="pt-[4.8rem] md:pt-[3.2rem] pb-10 md:pb-12">
         <div className="container-tbv">
           <div className="surface p-5 md:p-10 flex flex-col md:flex-row gap-10 items-center">
@@ -122,7 +152,7 @@ export default function TiendaPage() {
         </div>
       </section>
 
-      {/* ===== 4 cards (la FOTO es el botón) ===== */}
+      {/* ===== 4 cards ===== */}
       <section className="pb-24 md:pb-28">
         <div className="container-tbv">
           <h2 className="text-3xl md:text-4xl font-extrabold mb-10 text-center md:text-left">
@@ -161,7 +191,7 @@ export default function TiendaPage() {
         </div>
       </section>
 
-      {/* ===== Modal compra (sólido) ===== */}
+      {/* ===== Modal compra ===== */}
       {modalAbierto && productoSeleccionado && (
         <div
           className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4"
@@ -170,7 +200,8 @@ export default function TiendaPage() {
           <div
             className="w-full max-w-md rounded-2xl p-6 relative"
             style={{
-              background: "linear-gradient(180deg, rgba(20,30,45,1), rgba(15,22,30,.95))",
+              background:
+                "linear-gradient(180deg, rgba(20,30,45,1), rgba(15,22,30,.95))",
               border: "1px solid rgba(255,255,255,.1)",
               boxShadow: "0 0 40px rgba(0,0,0,.5)",
             }}
@@ -196,7 +227,9 @@ export default function TiendaPage() {
                 height={480}
                 className="w-full h-48 object-contain rounded-xl mx-auto mb-4"
               />
-              <h2 className="text-2xl font-bold mb-2">{productoSeleccionado.nombre}</h2>
+              <h2 className="text-2xl font-bold mb-2">
+                {productoSeleccionado.nombre}
+              </h2>
               <p className="text-[var(--tbv-gold)] font-semibold text-lg">
                 ${productoSeleccionado.precio.toLocaleString("es-AR")}
               </p>
@@ -214,7 +247,9 @@ export default function TiendaPage() {
                     type="button"
                     onClick={() => setColor(c.nombre)}
                     className={`w-9 h-9 rounded-full border-2 ${
-                      color === c.nombre ? "border-[var(--tbv-500)] scale-110" : "border-white/20"
+                      color === c.nombre
+                        ? "border-[var(--tbv-500)] scale-110"
+                        : "border-white/20"
                     } transition`}
                     style={{ background: c.hex }}
                     aria-label={`Color ${c.nombre}`}
@@ -251,7 +286,9 @@ export default function TiendaPage() {
 
             {/* Cantidad */}
             <div className="mb-6 text-center">
-              <h4 className="text-sm uppercase text-white/60 font-bold mb-2">Cantidad</h4>
+              <h4 className="text-sm uppercase text-white/60 font-bold mb-2">
+                Cantidad
+              </h4>
               <div className="flex items-center justify-center gap-4">
                 <button
                   type="button"
@@ -261,10 +298,12 @@ export default function TiendaPage() {
                 >
                   -
                 </button>
-                <span className="text-xl font-bold" aria-live="polite">{cantidad}</span>
+                <span className="text-xl font-bold" aria-live="polite">
+                  {cantidad}
+                </span>
                 <button
                   type="button"
-                  className="px-3 py-1 rounded-md bg-white/10 text-lg"
+                  className="px-3 py-1 rounded-md bg白/10 text-lg"
                   onClick={() => setCantidad(cantidad + 1)}
                   aria-label="Sumar cantidad"
                 >
@@ -277,7 +316,12 @@ export default function TiendaPage() {
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-lg font-semibold">Total:</h3>
               <span className="text-2xl font-bold text-[var(--tbv-500)]">
-                ${(productoSeleccionado.precio * cantidad).toLocaleString("es-AR")}
+                {(
+                  productoSeleccionado.precio * cantidad
+                ).toLocaleString("es-AR", {
+                  style: "currency",
+                  currency: "ARS",
+                })}
               </span>
             </div>
 

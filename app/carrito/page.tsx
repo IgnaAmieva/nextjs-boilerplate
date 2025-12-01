@@ -1,126 +1,119 @@
 "use client";
+
 import { useCart } from "@/src/context/CartContext";
+import CheckoutForm from "@/components/CheckoutForm";
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 
 export default function CarritoPage() {
-  const { state, setQty, remove, clear } = useCart();
-  const [loading, setLoading] = useState(false);
-  const search = useSearchParams();
-  const status = search.get("status"); // success | failure | pending
+  // 👇 ahora sí respetamos la forma real del contexto
+  const { state, remove, clear } = useCart();
+  const { items } = state;
+  const total = items.reduce(
+    (sum: number, item: any) => sum + (item.price ?? 0) * (item.qty ?? 0),
+    0
+  );
 
-  const subtotal = state.items.reduce((a, b) => a + b.price * b.qty, 0);
-
-  const banner = useMemo(() => {
-    if (!status) return null;
-    const base = "rounded-lg p-3 mb-6 text-sm";
-    if (status === "success")
-      return <div className={`${base}`} style={{background:"rgba(16,90,40,.35)", border:"1px solid rgba(46,204,113,.35)"}}>✅ Pago aprobado. ¡Gracias por tu compra!</div>;
-    if (status === "failure")
-      return <div className={`${base}`} style={{background:"rgba(120,0,0,.35)", border:"1px solid rgba(231,76,60,.35)"}}>❌ El pago fue rechazado o cancelado.</div>;
-    return <div className={`${base}`} style={{background:"rgba(60,60,0,.35)", border:"1px solid rgba(241,196,15,.35)"}}>⏳ El pago está pendiente.</div>;
-  }, [status]);
-
-  const pagar = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: state.items }),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        console.error("❌ Error al crear preferencia:", data);
-        alert(
-          `No se pudo iniciar el pago.\nMotivo: ${data?.error || res.status}\n` +
-          (data?.details ? `Detalles: ${JSON.stringify(data.details)}` : "") +
-          (data?.sent ? `\n\nPayload enviado:\n${JSON.stringify(data.sent, null, 2)}` : "")
-        );
-        return;
-      }
-
-      if (data?.init_point) {
-        window.location.href = data.init_point; // redirige a MP
-      } else {
-        alert("No se recibió init_point de Mercado Pago.");
-      }
-    } catch (e: any) {
-      alert(`Error iniciando el pago: ${e?.message || "Desconocido"}`);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const hayItems = items.length > 0;
 
   return (
-    <main className="pt-24 pb-24">
+    <main className="pt-[5rem] md:pt-[4rem] pb-20">
       <div className="container-tbv">
-        <h1 className="text-3xl md:text-4xl font-extrabold mb-4">Tu carrito</h1>
-        {banner}
+        <h1 className="text-3xl md:text-4xl font-extrabold mb-6">
+          Carrito &amp; datos de compra
+        </h1>
 
-        {state.items.length === 0 ? (
-          <div className="surface p-8 text-center">
-            <p className="text-white/70 mb-4">Tu carrito está vacío.</p>
-            <Link href="/tienda" className="btn btn-primary">Ir a la tienda</Link>
+        {!hayItems && (
+          <div className="surface p-6 text-center">
+            <p className="text-white/70 mb-4">
+              Todavía no agregaste ninguna prenda al carrito.
+            </p>
+            <Link href="/tienda" className="btn btn-primary">
+              Ir a la tienda
+            </Link>
           </div>
-        ) : (
-          <div className="grid md:grid-cols-[1fr,380px] gap-8">
-            {/* Lista de ítems */}
-            <div className="space-y-4">
-              {state.items.map((item, i) => (
-                <div key={`${item.id}-${item.color}-${item.size}-${i}`} className="surface p-4 flex gap-4 items-center">
-                  <Image src={item.image} alt={item.name} width={100} height={100} className="w-24 h-24 rounded-lg object-cover"/>
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <h3 className="font-bold">{item.name}</h3>
-                        <p className="text-sm text-white/70">
-                          {item.color ? <>Color: {item.color} · </> : null}
-                          {item.size ? <>Talle: {item.size}</> : null}
-                        </p>
-                      </div>
-                      <button className="text-white/70 hover:text-white" onClick={() => remove(item.id, item.color, item.size)}>
-                        Eliminar
-                      </button>
+        )}
+
+        {hayItems && (
+          <div className="grid lg:grid-cols-[1.25fr,1fr] gap-8 md:gap-10">
+            {/* --- Resumen de productos --- */}
+            <section className="surface p-5 md:p-7 self-start">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl md:text-2xl font-bold">Tu selección</h2>
+                <button
+                  type="button"
+                  onClick={clear}
+                  className="text-sm text-white/60 hover:text-white underline"
+                >
+                  Vaciar carrito
+                </button>
+              </div>
+
+              <ul className="space-y-4">
+                {items.map((item: any) => (
+                  <li
+                    key={item.id + (item.size ?? "") + (item.color ?? "")}
+                    className="flex gap-4 border-b border-white/10 pb-4 last:border-0 last:pb-0"
+                  >
+                    <div className="w-20 h-20 rounded-xl overflow-hidden bg-black/40 flex-shrink-0">
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        width={80}
+                        height={80}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
 
-                    <div className="mt-3 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <button className="px-3 py-1 rounded-md bg-white/10" onClick={() => setQty(item.id, Math.max(1, item.qty - 1), item.color, item.size)}>-</button>
-                        <span className="font-semibold">{item.qty}</span>
-                        <button className="px-3 py-1 rounded-md bg-white/10" onClick={() => setQty(item.id, item.qty + 1, item.color, item.size)}>+</button>
-                      </div>
-                      <div className="text-[var(--tbv-gold)] font-bold">
-                        ${(item.price * item.qty).toLocaleString("es-AR")}
-                      </div>
+                    <div className="flex-1">
+                      <p className="font-semibold">{item.name}</p>
+                      <p className="text-sm text-white/60">
+                        Talle: <strong>{item.size}</strong>{" "}
+                        · Color: <strong>{item.color}</strong>
+                      </p>
+                      <p className="text-sm text-white/60">
+                        Cantidad: <strong>{item.qty}</strong>
+                      </p>
+                      <p className="mt-1 font-semibold text-[var(--tbv-gold)]">
+                        $
+                        {(item.price * item.qty).toLocaleString("es-AR", {
+                          maximumFractionDigits: 0,
+                        })}
+                      </p>
                     </div>
-                  </div>
-                </div>
-              ))}
-            </div>
 
-            {/* Resumen */}
-            <aside className="surface p-6 h-fit">
-              <h2 className="font-bold text-xl mb-4">Resumen</h2>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-white/70">Subtotal</span>
-                <span className="font-semibold">${subtotal.toLocaleString("es-AR")}</span>
+                    <button
+                      type="button"
+                      onClick={() => remove(item.id, item.size, item.color)}
+                      className="text-sm text-white/60 hover:text-red-400"
+                    >
+                      ✕
+                    </button>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-6 flex items-center justify-between">
+                <span className="text-sm text-white/60">Total</span>
+                <span className="text-2xl font-bold text-[var(--tbv-gold)]">
+                  $
+                  {total.toLocaleString("es-AR", {
+                    maximumFractionDigits: 0,
+                  })}
+                </span>
               </div>
-              <div className="flex items-center justify-between mb-6">
-                <span className="text-white/70">Envío</span>
-                <span className="font-semibold">A calcular</span>
-              </div>
-              <button className="btn btn-primary w-full mb-3" onClick={pagar} disabled={loading}>
-                {loading ? "Redirigiendo…" : "Ir a pagar con Mercado Pago"}
-              </button>
-              <button className="btn btn-outline w-full" onClick={clear}>Vaciar carrito</button>
-              <p className="text-xs text-white/60 mt-4">
-                Al continuar serás redirigido al checkout seguro de Mercado Pago.
+
+              <p className="mt-3 text-xs text-white/50">
+                * El total final puede incluir costos de envío dependiendo de la
+                dirección que ingreses.
               </p>
-            </aside>
+            </section>
+
+            {/* --- Formulario de datos + pago --- */}
+            <section className="surface p-5 md:p-7 self-start">
+              {/* 👇 le pasamos los items y total reales */}
+              <CheckoutForm items={items} total={total} />
+            </section>
           </div>
         )}
       </div>

@@ -1,3 +1,4 @@
+// components/Navbar.tsx
 "use client";
 
 import Image from "next/image";
@@ -5,11 +6,22 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
+// URL de Google Sheets (podés sacarla a .env si querés)
+const SHEETS_URL =
+  process.env.NEXT_PUBLIC_SHEETS_URL ??
+  "https://docs.google.com/spreadsheets/d/XXXXXXXXXXXX/edit"; // poné tu link acá
+
 const links = [
-  { href: "/partidos", label: "Partidos" },
-  { href: "/sponsors", label: "Sponsors" },
+  // Partidos -> Google Sheets (externo)
+  { href: SHEETS_URL, label: "Partidos", external: true },
+
+  // Sponsors ahora va a /galeria
+  { href: "/galeria", label: "Sponsors" },
+
   { href: "/tienda", label: "Tienda" },
   { href: "/info", label: "Info útil" },
+
+  // Podés dejar o sacar esta, apunta también a /galeria
   { href: "/galeria", label: "Galería" },
 ];
 
@@ -36,7 +48,14 @@ export default function Navbar() {
       <div className="container-tbv h-full flex items-center justify-between">
         {/* ===== Logo ===== */}
         <Link href="/" className="flex items-center gap-3" aria-label="Inicio">
-          <Image src="/logo-tbv-avatar.png" alt="TBV" width={56} height={56} className="rounded-lg" priority />
+          <Image
+            src="/logo-tbv-avatar.png"
+            alt="TBV"
+            width={56}
+            height={56}
+            className="rounded-lg"
+            priority
+          />
           {/* Ocultar nombre en móvil, mostrar en md+ */}
           <span
             className="hidden md:inline text-lg md:text-xl font-extrabold tracking-wide"
@@ -49,15 +68,33 @@ export default function Navbar() {
         {/* ===== Navegación de escritorio ===== */}
         <nav className="hidden md:flex items-center gap-2" aria-label="Navegación principal">
           {links.map((l) => {
-            const active = path.startsWith(l.href);
+            const isExternal = (l as any).external || l.href.startsWith("http");
+            const active = !isExternal && path.startsWith(l.href);
+
+            const baseClasses =
+              "px-4 py-2 rounded-lg text-sm font-medium transition-colors";
+            const stateClasses = active ? "bg-white/10" : "hover:bg-white/10";
+
+            if (isExternal) {
+              return (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${baseClasses} ${stateClasses}`}
+                >
+                  {l.label}
+                </a>
+              );
+            }
+
             return (
               <Link
                 key={l.href}
                 href={l.href}
                 aria-current={active ? "page" : undefined}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  active ? "bg-white/10" : "hover:bg-white/10"
-                }`}
+                className={`${baseClasses} ${stateClasses}`}
               >
                 {l.label}
               </Link>
@@ -101,23 +138,38 @@ export default function Navbar() {
         <div
           className="md:hidden border-t border-white/10"
           style={{
-            background: "#0c1116", // 🔹 color sólido oscuro
+            background: "#0c1116",
             boxShadow: "0 4px 20px rgba(0,0,0,.45)",
           }}
         >
-          <nav
-            className="container-tbv py-4 grid gap-1"
-            aria-label="Navegación móvil"
-          >
-            {links.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className="px-3 py-3 rounded-md text-[var(--foreground)] font-medium hover:bg-white/10 transition"
-              >
-                {l.label}
-              </Link>
-            ))}
+          <nav className="container-tbv py-4 grid gap-1" aria-label="Navegación móvil">
+            {links.map((l) => {
+              const isExternal = (l as any).external || l.href.startsWith("http");
+
+              if (isExternal) {
+                return (
+                  <a
+                    key={l.href}
+                    href={l.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-3 rounded-md text-[var(--foreground)] font-medium hover:bg-white/10 transition"
+                  >
+                    {l.label}
+                  </a>
+                );
+              }
+
+              return (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className="px-3 py-3 rounded-md text-[var(--foreground)] font-medium hover:bg_white/10 transition"
+                >
+                  {l.label}
+                </Link>
+              );
+            })}
           </nav>
         </div>
       )}
