@@ -18,8 +18,8 @@ export default function Home() {
   return (
     <main>
       {/* ===== HERO ===== */}
-      <section className="hero-section pt-10 md:pt-8 pb-4 md:pb-8">
-        {/* En mobile el gap es chico, pero ahora bajamos botones y foto */}
+      {/* un poco más compacto en mobile para que se parezca al simulador */}
+      <section className="hero-section pt-10 md:pt-8 pb-3 md:pb-8">
         <div className="container-tbv flex flex-col md:flex-row items-center gap-4 md:gap-10">
           {/* Bloque: logo + texto + botones */}
           <div
@@ -43,12 +43,12 @@ export default function Home() {
             </div>
 
             {/* Texto debajo */}
-            <p className="mt-3 text-white/80 text-base md:text-lg max-w-sm md:max-w-2xl mx-auto md:mx-0">
+            <p className="mt-2 text-white/80 text-base md:text-lg max-w-sm md:max-w-2xl mx-auto md:mx-0">
               20 y 21 de diciembre · 3.ª edición.
             </p>
 
-            {/* Botones -> un poco más abajo en mobile */}
-            <div className="mt-24 md:mt-10 flex flex-row flex-wrap gap-3 md:gap-4 justify-center md:justify-start">
+            {/* Botones -> un poco más abajo que el texto, pero sin robar tanto alto */}
+            <div className="mt-20 md:mt-10 flex flex-row flex-wrap gap-3 md:gap-4 justify-center md:justify-start">
               <button
                 type="button"
                 onClick={() => setIsScheduleModalOpen(true)}
@@ -67,9 +67,9 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Bloque: foto secundaria -> más abajo en mobile */}
+          {/* Bloque: foto secundaria -> pegada a los botones pero sin ocupar tanto alto */}
           <div
-            className="animate-fade-up mt-6 md:mt-0"
+            className="animate-fade-up mt-3 md:mt-0"
             style={{ animationDelay: "140ms" }}
           >
             <div className="surface p-3">
