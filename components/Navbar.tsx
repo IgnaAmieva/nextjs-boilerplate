@@ -21,8 +21,6 @@ const links = [
   { href: "/tienda", label: "Tienda" },
   { href: "/info", label: "Info útil" },
 
-  // Podés dejar o sacar esta, apunta también a /galeria
-  { href: "/galeria", label: "Galería" },
 ];
 
 export default function Navbar() {
