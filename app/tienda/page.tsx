@@ -14,6 +14,8 @@ type Producto = {
   categoria: "Camiseta" | "Short" | "Entrenamiento";
 };
 
+const NUMERO_WPP = "5492622465311";
+
 export default function TiendaPage() {
   const router = useRouter();
   const { add } = useCart();
@@ -33,42 +35,42 @@ export default function TiendaPage() {
   ];
   const talles = ["S", "M", "L", "XL", "XXL", "XXXL"];
 
-  // ✅ Producto principal
+  // ✅ Producto principal (único que se paga online)
   const productoPrincipal: Producto = {
     id: "remera-oficial",
     nombre: "Remera oficial del torneo",
-    precio: 18000,
+    precio: 35000, // 👈 NUEVO PRECIO
     imagen: "/tienda/remera-blanca.jpg",
     categoria: "Camiseta",
   };
 
-  // ✅ Otras prendas
+  // ✅ Otras prendas → solo WhatsApp
   const productos: Producto[] = [
     {
       id: "remera-celeste",
       nombre: "Camiseta celeste",
-      precio: 18000,
+      precio: 0,
       imagen: "/tienda/remera-celeste1.jpg",
       categoria: "Camiseta",
     },
     {
       id: "remera-negra",
       nombre: "Camiseta negra",
-      precio: 18000,
+      precio: 0,
       imagen: "/tienda/remera-negra1.jpg",
       categoria: "Camiseta",
     },
     {
       id: "short-negro",
       nombre: "Short negro",
-      precio: 15000,
+      precio: 0,
       imagen: "/tienda/short-negro.jpg",
       categoria: "Short",
     },
     {
       id: "train-negra",
       nombre: "Remera entrenamiento",
-      precio: 14000,
+      precio: 0,
       imagen: "/tienda/train-negra.jpg",
       categoria: "Entrenamiento",
     },
@@ -100,8 +102,15 @@ export default function TiendaPage() {
     setAdding(false);
     setModalAbierto(false);
 
-    // 👉 Los llevo a la pantalla donde ahora completan todos los datos
+    // 👉 Los llevo a la pantalla donde completan todos los datos
     router.push("/carrito");
+  };
+
+  const consultarPorWhatsApp = (producto: Producto) => {
+    const mensaje = `Hola! Quería consultar si hay disponibilidad de *${producto.nombre}* de la Copa Tunuyán. ¿Qué talles y colores tienen?`;
+    window.location.href = `https://wa.me/${NUMERO_WPP}?text=${encodeURIComponent(
+      mensaje
+    )}`;
   };
 
   return (
@@ -135,7 +144,10 @@ export default function TiendaPage() {
 
               <div className="flex items-center justify-center md:justify-start gap-4 mb-6">
                 <span className="text-3xl font-bold text-[var(--tbv-gold)]">
-                  ${productoPrincipal.precio.toLocaleString("es-AR")}
+                  $
+                  {productoPrincipal.precio.toLocaleString("es-AR", {
+                    maximumFractionDigits: 0,
+                  })}
                 </span>
               </div>
 
@@ -152,7 +164,7 @@ export default function TiendaPage() {
         </div>
       </section>
 
-      {/* ===== 4 cards ===== */}
+      {/* ===== 4 cards (solo WhatsApp) ===== */}
       <section className="pb-24 md:pb-28">
         <div className="container-tbv">
           <h2 className="text-3xl md:text-4xl font-extrabold mb-10 text-center md:text-left">
@@ -165,8 +177,8 @@ export default function TiendaPage() {
                 key={p.id}
                 type="button"
                 className="surface overflow-hidden hover:brightness-110 transition block p-0 text-left"
-                onClick={() => abrirModal(p)}
-                aria-label={`Abrir ${p.nombre}`}
+                onClick={() => consultarPorWhatsApp(p)}
+                aria-label={`Consultar por WhatsApp sobre ${p.nombre}`}
               >
                 <Image
                   src={p.imagen}
@@ -176,6 +188,12 @@ export default function TiendaPage() {
                   className="w-full h-44 object-cover rounded-xl"
                   sizes="(max-width: 768px) 50vw, 25vw"
                 />
+                <div className="px-4 py-3">
+                  <p className="font-semibold text-sm">{p.nombre}</p>
+                  <p className="text-xs text-[var(--tbv-500)] mt-1">
+                    Consultar disponibilidad por WhatsApp
+                  </p>
+                </div>
               </button>
             ))}
           </div>
@@ -191,7 +209,7 @@ export default function TiendaPage() {
         </div>
       </section>
 
-      {/* ===== Modal compra ===== */}
+      {/* ===== Modal compra (solo remera oficial) ===== */}
       {modalAbierto && productoSeleccionado && (
         <div
           className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4"
@@ -231,7 +249,10 @@ export default function TiendaPage() {
                 {productoSeleccionado.nombre}
               </h2>
               <p className="text-[var(--tbv-gold)] font-semibold text-lg">
-                ${productoSeleccionado.precio.toLocaleString("es-AR")}
+                $
+                {productoSeleccionado.precio.toLocaleString("es-AR", {
+                  maximumFractionDigits: 0,
+                })}
               </p>
             </div>
 
@@ -303,7 +324,7 @@ export default function TiendaPage() {
                 </span>
                 <button
                   type="button"
-                  className="px-3 py-1 rounded-md bg白/10 text-lg"
+                  className="px-3 py-1 rounded-md bg-white/10 text-lg"
                   onClick={() => setCantidad(cantidad + 1)}
                   aria-label="Sumar cantidad"
                 >
@@ -321,6 +342,7 @@ export default function TiendaPage() {
                 ).toLocaleString("es-AR", {
                   style: "currency",
                   currency: "ARS",
+                  maximumFractionDigits: 0,
                 })}
               </span>
             </div>

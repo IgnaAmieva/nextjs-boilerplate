@@ -6,21 +6,25 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
-// URL de Google Sheets (podés sacarla a .env si querés)
+// 🔗 Link de INSCRIPCIÓN (por ahora Partidos apunta acá)
+const INSCRIPCION_URL =
+  "https://docs.google.com/forms/d/1dHdpHHzXWw2nZDABaTxdZQIDeEymd0jYNOx_OxfZVHs/edit";
+
+// Si querés seguir usando Sheets para otras cosas, podés dejar esto también:
 const SHEETS_URL =
   process.env.NEXT_PUBLIC_SHEETS_URL ??
-  "https://docs.google.com/spreadsheets/d/XXXXXXXXXXXX/edit"; // poné tu link acá
+  "https://docs.google.com/spreadsheets/d/XXXXXXXXXXXX/edit";
 
+// Links de navegación
 const links = [
-  // Partidos -> Google Sheets (externo)
-  { href: SHEETS_URL, label: "Partidos", external: true },
+  // Partidos -> FORMULARIO (externo, por ahora)
+  { href: INSCRIPCION_URL, label: "Partidos", external: true },
 
   // Sponsors ahora va a /galeria
   { href: "/galeria", label: "Sponsors" },
 
   { href: "/tienda", label: "Tienda" },
   { href: "/info", label: "Info útil" },
-
 ];
 
 export default function Navbar() {
@@ -42,7 +46,10 @@ export default function Navbar() {
   }, [path]);
 
   return (
-    <header className={`navbar navbar-stick ${glass ? "navbar--glass" : ""}`} role="banner">
+    <header
+      className={`navbar navbar-stick ${glass ? "navbar--glass" : ""}`}
+      role="banner"
+    >
       <div className="container-tbv h-full flex items-center justify-between">
         {/* ===== Logo ===== */}
         <Link href="/" className="flex items-center gap-3" aria-label="Inicio">
@@ -64,7 +71,10 @@ export default function Navbar() {
         </Link>
 
         {/* ===== Navegación de escritorio ===== */}
-        <nav className="hidden md:flex items-center gap-2" aria-label="Navegación principal">
+        <nav
+          className="hidden md:flex items-center gap-2"
+          aria-label="Navegación principal"
+        >
           {links.map((l) => {
             const isExternal = (l as any).external || l.href.startsWith("http");
             const active = !isExternal && path.startsWith(l.href);
@@ -140,7 +150,10 @@ export default function Navbar() {
             boxShadow: "0 4px 20px rgba(0,0,0,.45)",
           }}
         >
-          <nav className="container-tbv py-4 grid gap-1" aria-label="Navegación móvil">
+          <nav
+            className="container-tbv py-4 grid gap-1"
+            aria-label="Navegación móvil"
+          >
             {links.map((l) => {
               const isExternal = (l as any).external || l.href.startsWith("http");
 
@@ -162,7 +175,7 @@ export default function Navbar() {
                 <Link
                   key={l.href}
                   href={l.href}
-                  className="px-3 py-3 rounded-md text-[var(--foreground)] font-medium hover:bg_white/10 transition"
+                  className="px-3 py-3 rounded-md text-[var(--foreground)] font-medium hover:bg-white/10 transition"
                 >
                   {l.label}
                 </Link>

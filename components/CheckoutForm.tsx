@@ -10,7 +10,8 @@ interface CheckoutFormProps {
 }
 
 export default function CheckoutForm({ items, total }: CheckoutFormProps) {
-  const [metodoEntrega, setMetodoEntrega] = useState<MetodoEntrega>("retiro");
+  const [metodoEntrega, setMetodoEntrega] =
+    useState<MetodoEntrega>("retiro");
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -27,10 +28,7 @@ export default function CheckoutForm({ items, total }: CheckoutFormProps) {
     const direccion = data.get("direccion");
     const aclaraciones = data.get("aclaraciones");
 
-    // ============================
-    // 1) GENERAR LINK DE MERCADOPAGO
-    // ============================
-
+    // 1) Generar link de Mercado Pago
     let linkPago = "";
 
     try {
@@ -52,16 +50,13 @@ export default function CheckoutForm({ items, total }: CheckoutFormProps) {
       linkPago = "Error generando link de MP.";
     }
 
-    // ============================
-    // 2) ARMO MENSAJE DE WHATSAPP
-    // ============================
-
+    // 2) Armar mensaje para WhatsApp
     const carritoTexto = items
       .map(
         (item) =>
-          `• ${item.name} - Talle ${item.size} - Color ${item.color} x${item.qty} — $${(
-            item.price * item.qty
-          ).toLocaleString("es-AR")}`
+          `• ${item.name} - Talle ${item.size} - Color ${item.color} x${
+            item.qty
+          } — $${(item.price * item.qty).toLocaleString("es-AR")}`
       )
       .join("%0A");
 
@@ -73,7 +68,9 @@ export default function CheckoutForm({ items, total }: CheckoutFormProps) {
 • Email: ${email}
 • Teléfono: ${telefono}
 
-📍 *Entrega:* ${metodoEntrega === "envio" ? "Envío a domicilio" : "Retiro en sede"}
+📍 *Entrega:* ${
+      metodoEntrega === "envio" ? "Envío a domicilio" : "Retiro en sede"
+    }
 
 ${
   metodoEntrega === "envio"
@@ -103,11 +100,7 @@ ${linkPago}
 ¿Confirmamos? 🎉
 `.trim();
 
-    // ============================
-    // 3) REDIRECCIÓN A WHATSAPP
-    // ============================
-
-    const numeroDestino = "5492622465311"; // ← TU NÚMERO
+    const numeroDestino = "5492622465311";
 
     const url = `https://wa.me/${numeroDestino}?text=${encodeURIComponent(
       mensaje
@@ -118,7 +111,9 @@ ${linkPago}
 
   return (
     <section className="w-full">
-      <h2 className="text-2xl md:text-3xl font-semibold mb-3">Datos para la compra</h2>
+      <h2 className="text-2xl md:text-3xl font-semibold mb-3">
+        Datos para la compra
+      </h2>
 
       <p className="text-white/60 text-sm mb-8">
         Completá tus datos para finalizar la compra.

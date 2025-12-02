@@ -1,58 +1,48 @@
 // app/partidos/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
-import { listMatchesByDay, Match } from "@/src/services/matches";
+import Link from "next/link";
+
+const INSCRIPCION_URL =
+  "https://docs.google.com/forms/d/1dHdpHHzXWw2nZDABaTxdZQIDeEymd0jYNOx_OxfZVHs/edit";
 
 export default function PartidosPage() {
-  const [day, setDay] = useState(() => new Date().toISOString().slice(0, 10));
-  const [items, setItems] = useState<Array<{id: string} & Match>>([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
-      const data = await listMatchesByDay(day);
-      setItems(data);
-      setLoading(false);
-    })();
-  }, [day]);
-
   return (
-    <main className="pt-24 pb-16 container-tbv">
-      <h1 className="text-3xl font-extrabold mb-6">Partidos</h1>
+    <main className="pt-[5rem] md:pt-[4.5rem] pb-12">
+      <div className="container-tbv flex items-center justify-center min-h-[60vh]">
+        <div className="surface max-w-md w-full p-6 md:p-7 text-center">
+          <h1 className="text-2xl md:text-3xl font-bold mb-3">
+            Horarios del torneo
+          </h1>
 
-      <div className="mb-6">
-        <label className="text-sm text-white/70 mr-3">Día</label>
-        <input
-          type="date"
-          value={day}
-          onChange={(e) => setDay(e.target.value)}
-          className="bg-white/10 rounded-md px-3 py-2"
-        />
+          <p className="text-sm md:text-base text-white/80 mb-3">
+            Por el momento no es posible ver los partidos.
+            Los horarios se publicarán durante el torneo, el{" "}
+            <strong>20 y 21 de diciembre</strong>.
+          </p>
+
+          <p className="text-sm md:text-base text-white/80 mb-5">
+            Mientras tanto, podés inscribirte a la <strong>Copa Tunuyán</strong>{" "}
+            desde el siguiente enlace:
+          </p>
+
+          <a
+            href={INSCRIPCION_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-primary w-full mb-3"
+          >
+            Inscribirme para jugar
+          </a>
+
+          <Link
+            href="/"
+            className="block text-sm text-white/70 hover:text-white underline mt-1"
+          >
+            ← Volver al inicio
+          </Link>
+        </div>
       </div>
-
-      {loading ? (
-        <p className="text-white/70">Cargando…</p>
-      ) : items.length === 0 ? (
-        <p className="text-white/70">No hay partidos para este día.</p>
-      ) : (
-        <ul className="grid gap-3">
-          {items.map(m => (
-            <li key={m.id} className="surface p-4 rounded-lg">
-              <div className="text-sm text-white/60">
-                {m.day} · {m.time} · {m.court} · {m.category}
-              </div>
-              <div className="font-bold mt-1">
-                {m.teamA} vs {m.teamB}
-              </div>
-              <div className="text-white/70 text-sm">
-                Estado: {m.status} {m.score?.A ? `· ${m.score.A} / ${m.score.B ?? ""}` : ""}
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
     </main>
   );
 }
